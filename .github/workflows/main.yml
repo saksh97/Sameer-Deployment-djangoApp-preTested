@@ -1,0 +1,22 @@
+# 1. Trigger whenever code is pushed to the 'main' branch
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 2. SSH into the target server and update the app
+      - name: Pull latest code and restart Docker Compose
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /root/
+            git pull origin main
+            cd /root/Sameer-Deployment-djangoApp-preTested
+            docker compose up -d --build
+            docker image prune -f
